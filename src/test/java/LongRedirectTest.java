@@ -8,7 +8,6 @@ public class LongRedirectTest {
         String link = "https://playground.learnqa.ru/api/long_redirect";
 
         while (link != null){
-            System.out.println("\n" + link);
 
             Response checkLocation = RestAssured
                     .given()
@@ -18,6 +17,9 @@ public class LongRedirectTest {
                     .get(link)
                     .andReturn();
             link = checkLocation.getHeader("Location");
+            if (link != null){
+                System.out.println("\n" + link);
+            }
         }
     }
 }
