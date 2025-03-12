@@ -2,13 +2,13 @@ import io.restassured.RestAssured;
 import io.restassured.response.Response;
 import org.junit.jupiter.api.Test;
 
-public class LongRedirectTest {
+public class LongRedirectCycleTest {
     @Test
     public void testRestAssured(){
         String link = "https://playground.learnqa.ru/api/long_redirect";
+        int statusCode = 0;
 
-        while (link != null){
-
+        while (statusCode != 200 && link != null){
             Response checkLocation = RestAssured
                     .given()
                     .redirects()
@@ -17,9 +17,7 @@ public class LongRedirectTest {
                     .get(link)
                     .andReturn();
             link = checkLocation.getHeader("Location");
-            if (link != null){
-                System.out.println("\n" + link);
-            }
+            statusCode = checkLocation.getStatusCode();
         }
     }
 }
