@@ -9,7 +9,7 @@ public class CookieHomeworkTest  extends BaseTestcase {
     @Test
     public void testLongTimeJob() {
             Response response = RestAssured
-                    .get("https://playground.learnqa.ru/ajax/api/homework_cookie")
+                    .get("https://playground.learnqa.ru/api/homework_cookie")
                     .andReturn();
             String cookie = this.getCookie(response,"HomeWork");
         assertEquals("hw_value", cookie, "Cookie doesn't match");
