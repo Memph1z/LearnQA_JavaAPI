@@ -46,4 +46,15 @@ public class ApiCoreRequests {
                 .post(url)
                 .andReturn();
     }
+
+    @Step("Make a POST request with missing key")
+    public Response makePostRequestWithMissingKey(String url, String missingKey){
+        Map<String, String> data = DataGenerator.getRegistrationData();
+        data.remove(missingKey);
+        return given()
+                .filter(new AllureRestAssured())
+                .body(data)
+                .post(url)
+                .andReturn();
+    }
 }
