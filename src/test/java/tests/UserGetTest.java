@@ -16,7 +16,7 @@ public class UserGetTest extends BaseTestcase {
                 .get("https://playground.learnqa.ru/api/user/2")
                 .andReturn();
 
-        Assertions.assertJsonHasNoField(responseUserData,"username");
+        Assertions.assertJsonHasField(responseUserData,"username");
         Assertions.assertJsonHasNoField(responseUserData, "firstName");
         Assertions.assertJsonHasNoField(responseUserData, "lastName");
         Assertions.assertJsonHasNoField(responseUserData, "email");
