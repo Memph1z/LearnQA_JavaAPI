@@ -1,62 +1,110 @@
 package tests;
 
-import io.restassured.RestAssured;
-import io.restassured.path.json.JsonPath;
 import io.restassured.response.Response;
+import lib.ApiCoreRequests;
 import lib.Assertions;
 import lib.BaseTestcase;
 import lib.DataGenerator;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.util.HashMap;
 import java.util.Map;
 
 public class UserEditTest extends BaseTestcase {
-    @Test
-    public void testEditJustCreatedTest(){
-        //GENERATE USER
+    private final ApiCoreRequests apiCoreRequests = new ApiCoreRequests();
+
+    String cookie;
+    String header;
+    String userId;
+
+    @BeforeEach
+    public void generateAndLoginUser(){
         Map<String, String> userData = DataGenerator.getRegistrationData();
+        Response responseCreateAuth = apiCoreRequests.makePostRequest("https://playground.learnqa.ru/api/user/", userData);
 
-        JsonPath responseCreateAuth = RestAssured
-                .given()
-                .body(userData)
-                .post("https://playground.learnqa.ru/api/user/")
-                .jsonPath();
+        this.userId = responseCreateAuth.jsonPath().getString("id");
 
-        String userId = responseCreateAuth.getString("id");
-
-        //LOGIN
         Map<String, String> authData = new HashMap<>();
         authData.put("email", userData.get("email"));
         authData.put("password", userData.get("password"));
+        Response responseGetAuth = apiCoreRequests.makePostRequest("https://playground.learnqa.ru/api/user/login", authData);
 
-        Response responseGetAuth = RestAssured
-                .given()
-                .body(authData)
-                .post("https://playground.learnqa.ru/api/user/login")
-                .andReturn();
+        this.cookie = this.getCookie(responseGetAuth, "auth_sid");
+        this.header = this.getHeader(responseGetAuth,"x-csrf-token");
+    }
+
+    @Test
+    public void testEditJustCreatedTest(){
 
         //EDIT
         String newName = "Changed Name";
         Map<String, String> editData = new HashMap<>();
         editData.put("firstName", newName);
 
-        Response responseEditUse = RestAssured
-                .given()
-                .header("x-csrf-token", this.getHeader(responseGetAuth, "x-csrf-token"))
-                .cookie("auth_sid", this.getCookie(responseGetAuth, "auth_sid"))
-                .body(editData)
-                .put("https://playground.learnqa.ru/api/user/" + userId)
-                .andReturn();
+        Response responseEditUser = apiCoreRequests.makePutRequest("https://playground.learnqa.ru/api/user/" + this.userId, this.header, this.cookie, editData);
 
         //GET
-        Response responseUserData = RestAssured
-                .given()
-                .header("x-csrf-token", this.getHeader(responseGetAuth, "x-csrf-token"))
-                .cookie("auth_sid", this.getCookie(responseGetAuth, "auth_sid"))
-                .get("https://playground.learnqa.ru/api/user/" + userId)
-                .andReturn();
+        Response responseUserData = apiCoreRequests.makeGetRequest("https://playground.learnqa.ru/api/user/" + this.userId, this.header, this.cookie);
 
         Assertions.assertJsonByName(responseUserData, "firstName", newName);
+    }
+    @Test
+    public void testEditNoAuthToken(){
+        //EDIT
+        String newName = "Even More Changed Name";
+        Map<String, String> editData = new HashMap<>();
+        editData.put("firstName", newName);
+
+        Response responseEditUser = apiCoreRequests.makePutRequestWithCookie("https://playground.learnqa.ru/api/user/2", this.cookie, editData);
+
+        Assertions.assertResponseCodeEquals(responseEditUser, 400);
+        Assertions.assertJsonByName(responseEditUser, "error", "Auth token not supplied");
+    }
+    @Test
+    public void testEditNoAuthCookie(){
+        //EDIT
+        String newName = "Even More Changed Name";
+        Map<String, String> editData = new HashMap<>();
+        editData.put("firstName", newName);
+
+        Response responseEditUser = apiCoreRequests.makePutRequestWithToken("https://playground.learnqa.ru/api/user/2", this.header, editData);
+
+        Assertions.assertResponseCodeEquals(responseEditUser, 400);
+        Assertions.assertJsonByName(responseEditUser, "error", "Auth token not supplied");
+    }
+    @Test
+    public void testEditAuthAsOtherUser() {
+        //EDIT
+        String newName = "Even More Changed Name";
+        Map<String, String> editData = new HashMap<>();
+        editData.put("firstName", newName);
+
+        Response responseEditUser = apiCoreRequests.makePutRequest("https://playground.learnqa.ru/api/user/11", this.header, this.cookie, editData);
+
+        Assertions.assertResponseCodeEquals(responseEditUser, 400);
+        Assertions.assertJsonByName(responseEditUser, "error", "This user can only edit their own data.");
+    }
+    @Test
+    public void testEditUserWithIrregularEmail() {
+        //EDIT
+        Map<String, String> editData = new HashMap<>();
+        editData.put("email", "2783648723648example.com");
+
+        Response responseEditUser = apiCoreRequests.makePutRequest("https://playground.learnqa.ru/api/user/" + this.userId, this.header, this.cookie, editData);
+
+        Assertions.assertResponseCodeEquals(responseEditUser, 400);
+        Assertions.assertJsonByName(responseEditUser, "error", "Invalid email format");
+    }
+    @Test
+    public void testEditUserWithShortFirstName() {
+        //EDIT
+        Map<String, String> editData = new HashMap<>();
+        editData.put("firstName", "1");
+
+        Response responseEditUser = apiCoreRequests.makePutRequest("https://playground.learnqa.ru/api/user/" + this.userId, this.header, this.cookie, editData);
+
+        Assertions.assertResponseCodeEquals(responseEditUser, 400);
+        Assertions.assertJsonByName(responseEditUser, "error", "The value for field `firstName` is too short");
     }
 }
