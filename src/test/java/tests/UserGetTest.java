@@ -1,20 +1,28 @@
 package tests;
 
+import io.qameta.allure.*;
 import io.restassured.RestAssured;
 import io.restassured.response.Response;
 import lib.ApiCoreRequests;
 import lib.Assertions;
 import lib.BaseTestcase;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import java.util.HashMap;
 import java.util.Map;
 
+@Epic("Get cases")
+@Feature("Get")
 public class UserGetTest extends BaseTestcase {
     private final ApiCoreRequests apiCoreRequests = new ApiCoreRequests();
     String locale = "api_dev";
 
     @Test
+    @Description("This test checks getting user info w/o sending auth cookie or token")
+    @DisplayName("Test negative get user")
+    @Severity(SeverityLevel.BLOCKER)
+    @TmsLink("https://example.com/tests/n")
     public void testGetUserDataNotAuth(){
         Response responseUserData = RestAssured
                 .get("https://playground.learnqa.ru/" + locale + "/user/2")
@@ -28,6 +36,10 @@ public class UserGetTest extends BaseTestcase {
     }
 
     @Test
+    @Description("This test checks getting user info successfully")
+    @DisplayName("Test positive get user")
+    @Severity(SeverityLevel.BLOCKER)
+    @TmsLink("https://example.com/tests/n")
     public void testGetUserDetailsAuthAsSameUser(){
         Map<String,String> authData = new HashMap<>();
         authData.put("email", "vinkotov@example.com");
@@ -54,6 +66,10 @@ public class UserGetTest extends BaseTestcase {
         Assertions.assertResponseCodeEquals(responseUserData, 200);
     }
     @Test
+    @Description("This test checks getting user info while sending auth cookie or token from other user")
+    @DisplayName("Test negative get user")
+    @Severity(SeverityLevel.BLOCKER)
+    @TmsLink("https://example.com/tests/n")
     public void testGetUserDetailsAuthAsOtherUser(){
         Map<String,String> authData = new HashMap<>();
         authData.put("email", "vinkotov@example.com");

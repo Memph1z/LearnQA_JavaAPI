@@ -1,16 +1,20 @@
 package tests;
 
+import io.qameta.allure.*;
 import io.restassured.response.Response;
 import lib.ApiCoreRequests;
 import lib.Assertions;
 import lib.BaseTestcase;
 import lib.DataGenerator;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import java.util.HashMap;
 import java.util.Map;
 
+@Epic("Edit cases")
+@Feature("Edit")
 public class UserEditTest extends BaseTestcase {
     private final ApiCoreRequests apiCoreRequests = new ApiCoreRequests();
     String locale = "api_dev";
@@ -36,6 +40,10 @@ public class UserEditTest extends BaseTestcase {
     }
 
     @Test
+    @Description("This test checks editing user info successfully")
+    @DisplayName("Test positive edit user")
+    @Severity(SeverityLevel.BLOCKER)
+    @TmsLink("https://example.com/tests/n")
     public void testEditJustCreatedTest(){
 
         //EDIT
@@ -51,6 +59,10 @@ public class UserEditTest extends BaseTestcase {
         Assertions.assertJsonByName(responseUserData, "firstName", newName);
     }
     @Test
+    @Description("This test checks editing user info w/o sending auth token")
+    @DisplayName("Test negative edit user")
+    @Severity(SeverityLevel.BLOCKER)
+    @TmsLink("https://example.com/tests/n")
     public void testEditNoAuthToken(){
         //EDIT
         String newName = "Even More Changed Name";
@@ -63,6 +75,10 @@ public class UserEditTest extends BaseTestcase {
         Assertions.assertJsonByName(responseEditUser, "error", "Auth token not supplied");
     }
     @Test
+    @Description("This test checks editing user info w/o sending auth cookie")
+    @DisplayName("Test negative edit user")
+    @Severity(SeverityLevel.BLOCKER)
+    @TmsLink("https://example.com/tests/n")
     public void testEditNoAuthCookie(){
         //EDIT
         String newName = "Even More Changed Name";
@@ -75,6 +91,10 @@ public class UserEditTest extends BaseTestcase {
         Assertions.assertJsonByName(responseEditUser, "error", "Auth token not supplied");
     }
     @Test
+    @Description("This test checks editing user info while sending auth cookie or token from other user")
+    @DisplayName("Test negative edit user")
+    @Severity(SeverityLevel.BLOCKER)
+    @TmsLink("https://example.com/tests/n")
     public void testEditAuthAsOtherUser() {
         //EDIT
         String newName = "Even More Changed Name2";
@@ -87,6 +107,10 @@ public class UserEditTest extends BaseTestcase {
         Assertions.assertJsonByName(responseEditUser, "error", "This user can only edit their own data.");
     }
     @Test
+    @Description("This test checks editing user info with irregular email")
+    @DisplayName("Test negative edit user")
+    @Severity(SeverityLevel.BLOCKER)
+    @TmsLink("https://example.com/tests/n")
     public void testEditUserWithIrregularEmail() {
         //EDIT
         Map<String, String> editData = new HashMap<>();
@@ -98,6 +122,10 @@ public class UserEditTest extends BaseTestcase {
         Assertions.assertJsonByName(responseEditUser, "error", "Invalid email format");
     }
     @Test
+    @Description("This test checks editing user info with short first name")
+    @DisplayName("Test negative edit user")
+    @Severity(SeverityLevel.BLOCKER)
+    @TmsLink("https://example.com/tests/n")
     public void testEditUserWithShortFirstName() {
         //EDIT
         Map<String, String> editData = new HashMap<>();

@@ -1,16 +1,19 @@
 package tests;
 
+import io.qameta.allure.*;
 import io.restassured.response.Response;
 import lib.BaseTestcase;
 import lib.ApiCoreRequests;
 import lib.Assertions;
 import lib.DataGenerator;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import java.util.HashMap;
 import java.util.Map;
 
-
+@Epic("Deletion cases")
+@Feature("Deletion")
 public class UserDeleteTest extends BaseTestcase {
     private final ApiCoreRequests apiCoreRequests = new ApiCoreRequests();
     String cookie;
@@ -19,6 +22,10 @@ public class UserDeleteTest extends BaseTestcase {
     String locale = "api_dev";
 
     @Test
+    @Description("This test checks deleting undeletable user")
+    @DisplayName("Test negative delete user")
+    @Severity(SeverityLevel.BLOCKER)
+    @TmsLink("https://example.com/tests/n")
     public void testDeleteUndeletableUser(){
         //LOGIN
         Map<String, String> authData = new HashMap<>();
@@ -37,6 +44,10 @@ public class UserDeleteTest extends BaseTestcase {
     }
 
     @Test
+    @Description("This test checks deleting user successfully")
+    @DisplayName("Test positive delete user")
+    @Severity(SeverityLevel.BLOCKER)
+    @TmsLink("https://example.com/tests/n")
     public void testDeleteUser(){
         //GENERATE
         Map<String, String> userData = DataGenerator.getRegistrationData();
@@ -65,6 +76,10 @@ public class UserDeleteTest extends BaseTestcase {
     }
 
     @Test
+    @Description("This test checks deleting user while sending token and cookie from other user")
+    @DisplayName("Test negative delete user")
+    @Severity(SeverityLevel.BLOCKER)
+    @TmsLink("https://example.com/tests/n")
     public void testDeleteOtherUser(){
         //GENERATE
         Map<String, String> userData = DataGenerator.getRegistrationData();
