@@ -77,11 +77,11 @@ public class UserEditTest extends BaseTestcase {
     @Test
     public void testEditAuthAsOtherUser() {
         //EDIT
-        String newName = "Even More Changed Name";
+        String newName = "Even More Changed Name2";
         Map<String, String> editData = new HashMap<>();
         editData.put("firstName", newName);
 
-        Response responseEditUser = apiCoreRequests.makePutRequest("https://playground.learnqa.ru/" + locale + "/user/11", this.header, this.cookie, editData);
+        Response responseEditUser = apiCoreRequests.makePutRequest("https://playground.learnqa.ru/" + locale + "/user/120068", this.header, this.cookie, editData);
 
         Assertions.assertResponseCodeEquals(responseEditUser, 400);
         Assertions.assertJsonByName(responseEditUser, "error", "This user can only edit their own data.");
