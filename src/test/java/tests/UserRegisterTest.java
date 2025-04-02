@@ -15,7 +15,7 @@ import org.junit.jupiter.params.provider.ValueSource;
 
 public class UserRegisterTest extends BaseTestcase {
     private final ApiCoreRequests apiCoreRequests = new ApiCoreRequests();
-
+    String locale = "api_dev";
 
     @Test
     public void testCreateUserWithExistingEmail(){
@@ -27,7 +27,7 @@ public class UserRegisterTest extends BaseTestcase {
         Response responseCreateAuth = RestAssured
                 .given()
                 .body(userData)
-                .post("https://playground.learnqa.ru/api/user")
+                .post("https://playground.learnqa.ru/" + locale + "/user")
                 .andReturn();
 
         Assertions.assertResponseTextEquals(responseCreateAuth,"Users with email '" + email + "' already exists");
@@ -40,7 +40,7 @@ public class UserRegisterTest extends BaseTestcase {
         Response responseCreateAuth = RestAssured
                 .given()
                 .body(userData)
-                .post("https://playground.learnqa.ru/api/user")
+                .post("https://playground.learnqa.ru/" + locale + "/user")
                 .andReturn();
 
         Assertions.assertResponseCodeEquals(responseCreateAuth,200);
@@ -52,7 +52,7 @@ public class UserRegisterTest extends BaseTestcase {
         faultyUserData.put("email", "2783648723648example.com");
         faultyUserData = DataGenerator.getRegistrationData(faultyUserData);
 
-        Response responseForCheck = apiCoreRequests.makePostRequest("https://playground.learnqa.ru/api/user",faultyUserData);
+        Response responseForCheck = apiCoreRequests.makePostRequest("https://playground.learnqa.ru/" + locale + "/user",faultyUserData);
         Assertions.assertResponseCodeEquals(responseForCheck,400);
         Assertions.assertResponseTextEquals(responseForCheck, "Invalid email format");
     }
@@ -62,7 +62,7 @@ public class UserRegisterTest extends BaseTestcase {
         faultyUserData.put("firstName", "1");
         faultyUserData = DataGenerator.getRegistrationData(faultyUserData);
 
-        Response responseForCheck = apiCoreRequests.makePostRequest("https://playground.learnqa.ru/api/user",faultyUserData);
+        Response responseForCheck = apiCoreRequests.makePostRequest("https://playground.learnqa.ru/" + locale + "/user",faultyUserData);
         Assertions.assertResponseCodeEquals(responseForCheck,400);
         Assertions.assertResponseTextEquals(responseForCheck, "The value of 'firstName' field is too short");
     }
@@ -72,7 +72,7 @@ public class UserRegisterTest extends BaseTestcase {
         faultyUserData.put("firstName", "fihitjbxeegigugymfnjzfxcjeynrzerhaeictzarnkkenuvmfraeudjtmankcxguadzuuyueiwxrmaiiwvyeztwpecwmzkwimceimpaubxjpxfjzhvqmzdvjihetjaubzavmpqeykvzxicqzuifvzxtxfhnmixmrewcwupwtewvqmptgueaqmcbvfkgrrmrqcqivnubccdrnfmugaajcaavwcvnnivkwrgiaznhrhbjkbxnhkactfizxdj");
         faultyUserData = DataGenerator.getRegistrationData(faultyUserData);
 
-        Response responseForCheck = apiCoreRequests.makePostRequest("https://playground.learnqa.ru/api/user",faultyUserData);
+        Response responseForCheck = apiCoreRequests.makePostRequest("https://playground.learnqa.ru/" + locale + "/user",faultyUserData);
         Assertions.assertResponseCodeEquals(responseForCheck,400);
         Assertions.assertResponseTextEquals(responseForCheck, "The value of 'firstName' field is too long");
     }
@@ -80,7 +80,8 @@ public class UserRegisterTest extends BaseTestcase {
     @ValueSource(strings = {"email", "password", "username", "firstName", "lastName"})
     public void testCreateUserWithMissingKeys(String condition){
 
-        Response responseForCheck = apiCoreRequests.makePostRequestWithMissingKey("https://playground.learnqa.ru/api/user",condition);
+        Response responseForCheck = apiCoreRequests.makePostRequestWithMissingKey("https://playground.learnqa.ru/" + locale + "/user",condition);
         Assertions.assertResponseTextEquals(responseForCheck, "The following required params are missed: " + condition);
+        Assertions.assertResponseCodeEquals(responseForCheck, 400);
     }
 }

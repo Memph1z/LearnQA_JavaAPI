@@ -1,8 +1,6 @@
 package tests;
 
-import io.restassured.RestAssured;
 import io.restassured.response.Response;
-import io.restassured.specification.RequestSpecification;
 import lib.BaseTestcase;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -24,6 +22,7 @@ public class UserAuthTest extends BaseTestcase {
     String cookie;
     String header;
     int userIdOnAuth;
+    String locale = "api_dev";
     private final ApiCoreRequests apiCoreRequests = new ApiCoreRequests();
 
     @BeforeEach
@@ -33,7 +32,7 @@ public class UserAuthTest extends BaseTestcase {
         authData.put("password", "1234");
 
         Response responseGetAuth = apiCoreRequests
-                .makePostRequest("https://playground.learnqa.ru/api/user/login", authData);
+                .makePostRequest("https://playground.learnqa.ru/" + locale + "/user/login", authData);
 
         this.cookie = this.getCookie(responseGetAuth, "auth_sid");
         this.header = this.getHeader(responseGetAuth,"x-csrf-token");
@@ -46,7 +45,7 @@ public class UserAuthTest extends BaseTestcase {
     public void testAuthUser(){
         Response responseCheckAuth = apiCoreRequests
                 .makeGetRequest(
-                        "https://playground.learnqa.ru/api/user/auth",
+                        "https://playground.learnqa.ru/" + locale + "/user/auth",
                         this.header,
                         this.cookie);
 
@@ -61,12 +60,12 @@ public class UserAuthTest extends BaseTestcase {
 
         if (condition.equals("cookie")){
             Response responseForCheck = apiCoreRequests.makeGetRequestWithCookie(
-                    "https://playground.learnqa.ru/api/user/auth",
+                    "https://playground.learnqa.ru/" + locale + "/user/auth",
                     this.cookie);
             Assertions.assertJsonByName(responseForCheck,"user_id",0);
         } else if (condition.equals("headers")) {
             Response responseForCheck = apiCoreRequests.makeGetRequestWithToken(
-                    "https://playground.learnqa.ru/api/user/auth",
+                    "https://playground.learnqa.ru/" + locale + "/user/auth",
                     this.header);
             Assertions.assertJsonByName(responseForCheck,"user_id",0);
         } else {

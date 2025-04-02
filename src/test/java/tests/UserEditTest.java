@@ -13,6 +13,7 @@ import java.util.Map;
 
 public class UserEditTest extends BaseTestcase {
     private final ApiCoreRequests apiCoreRequests = new ApiCoreRequests();
+    String locale = "api_dev";
 
     String cookie;
     String header;
@@ -21,14 +22,14 @@ public class UserEditTest extends BaseTestcase {
     @BeforeEach
     public void generateAndLoginUser(){
         Map<String, String> userData = DataGenerator.getRegistrationData();
-        Response responseCreateAuth = apiCoreRequests.makePostRequest("https://playground.learnqa.ru/api/user/", userData);
+        Response responseCreateAuth = apiCoreRequests.makePostRequest("https://playground.learnqa.ru/" + locale + "/user/", userData);
 
         this.userId = responseCreateAuth.jsonPath().getString("id");
 
         Map<String, String> authData = new HashMap<>();
         authData.put("email", userData.get("email"));
         authData.put("password", userData.get("password"));
-        Response responseGetAuth = apiCoreRequests.makePostRequest("https://playground.learnqa.ru/api/user/login", authData);
+        Response responseGetAuth = apiCoreRequests.makePostRequest("https://playground.learnqa.ru/" + locale + "/user/login", authData);
 
         this.cookie = this.getCookie(responseGetAuth, "auth_sid");
         this.header = this.getHeader(responseGetAuth,"x-csrf-token");
@@ -42,10 +43,10 @@ public class UserEditTest extends BaseTestcase {
         Map<String, String> editData = new HashMap<>();
         editData.put("firstName", newName);
 
-        Response responseEditUser = apiCoreRequests.makePutRequest("https://playground.learnqa.ru/api/user/" + this.userId, this.header, this.cookie, editData);
+        Response responseEditUser = apiCoreRequests.makePutRequest("https://playground.learnqa.ru/" + locale + "/user/" + this.userId, this.header, this.cookie, editData);
 
         //GET
-        Response responseUserData = apiCoreRequests.makeGetRequest("https://playground.learnqa.ru/api/user/" + this.userId, this.header, this.cookie);
+        Response responseUserData = apiCoreRequests.makeGetRequest("https://playground.learnqa.ru/" + locale + "/user/" + this.userId, this.header, this.cookie);
 
         Assertions.assertJsonByName(responseUserData, "firstName", newName);
     }
@@ -56,7 +57,7 @@ public class UserEditTest extends BaseTestcase {
         Map<String, String> editData = new HashMap<>();
         editData.put("firstName", newName);
 
-        Response responseEditUser = apiCoreRequests.makePutRequestWithCookie("https://playground.learnqa.ru/api/user/2", this.cookie, editData);
+        Response responseEditUser = apiCoreRequests.makePutRequestWithCookie("https://playground.learnqa.ru/" + locale + "/user/2", this.cookie, editData);
 
         Assertions.assertResponseCodeEquals(responseEditUser, 400);
         Assertions.assertJsonByName(responseEditUser, "error", "Auth token not supplied");
@@ -68,7 +69,7 @@ public class UserEditTest extends BaseTestcase {
         Map<String, String> editData = new HashMap<>();
         editData.put("firstName", newName);
 
-        Response responseEditUser = apiCoreRequests.makePutRequestWithToken("https://playground.learnqa.ru/api/user/2", this.header, editData);
+        Response responseEditUser = apiCoreRequests.makePutRequestWithToken("https://playground.learnqa.ru/" + locale + "/user/2", this.header, editData);
 
         Assertions.assertResponseCodeEquals(responseEditUser, 400);
         Assertions.assertJsonByName(responseEditUser, "error", "Auth token not supplied");
@@ -80,7 +81,7 @@ public class UserEditTest extends BaseTestcase {
         Map<String, String> editData = new HashMap<>();
         editData.put("firstName", newName);
 
-        Response responseEditUser = apiCoreRequests.makePutRequest("https://playground.learnqa.ru/api/user/11", this.header, this.cookie, editData);
+        Response responseEditUser = apiCoreRequests.makePutRequest("https://playground.learnqa.ru/" + locale + "/user/11", this.header, this.cookie, editData);
 
         Assertions.assertResponseCodeEquals(responseEditUser, 400);
         Assertions.assertJsonByName(responseEditUser, "error", "This user can only edit their own data.");
@@ -91,7 +92,7 @@ public class UserEditTest extends BaseTestcase {
         Map<String, String> editData = new HashMap<>();
         editData.put("email", "2783648723648example.com");
 
-        Response responseEditUser = apiCoreRequests.makePutRequest("https://playground.learnqa.ru/api/user/" + this.userId, this.header, this.cookie, editData);
+        Response responseEditUser = apiCoreRequests.makePutRequest("https://playground.learnqa.ru/" + locale + "/user/" + this.userId, this.header, this.cookie, editData);
 
         Assertions.assertResponseCodeEquals(responseEditUser, 400);
         Assertions.assertJsonByName(responseEditUser, "error", "Invalid email format");
@@ -102,7 +103,7 @@ public class UserEditTest extends BaseTestcase {
         Map<String, String> editData = new HashMap<>();
         editData.put("firstName", "1");
 
-        Response responseEditUser = apiCoreRequests.makePutRequest("https://playground.learnqa.ru/api/user/" + this.userId, this.header, this.cookie, editData);
+        Response responseEditUser = apiCoreRequests.makePutRequest("https://playground.learnqa.ru/" + locale + "/user/" + this.userId, this.header, this.cookie, editData);
 
         Assertions.assertResponseCodeEquals(responseEditUser, 400);
         Assertions.assertJsonByName(responseEditUser, "error", "The value for field `firstName` is too short");
